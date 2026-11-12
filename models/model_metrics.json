@@ -1,0 +1,220 @@
+{
+  "1": {
+    "crop_key": "1",
+    "crop_code": "paddy",
+    "crop_name": "Paddy (Rice)",
+    "model_file": "models/paddy_model.joblib",
+    "dataset_source": "GCEK Kalahandi / PeerJ CS IoT-IIRS Dataset",
+    "source_url": "https://github.com/GCEKIoTCommunity/Irrigation-Dataset",
+    "records_count": 100,
+    "features": [
+      "CropDays",
+      "Soil Moisture",
+      "Soil Temperature",
+      "Temperature",
+      "Humidity"
+    ],
+    "algorithm": "Logistic Regression with StandardScaler",
+    "accuracy": 0.85,
+    "precision": 0.5,
+    "recall": 0.3333,
+    "f1_score": 0.4,
+    "confusion_matrix": [
+      [
+        16,
+        1
+      ],
+      [
+        2,
+        1
+      ]
+    ],
+    "training_date": "2026-11-11"
+  },
+  "2": {
+    "crop_key": "2",
+    "crop_code": "groundnuts",
+    "crop_name": "Ground Nuts (Peanut)",
+    "model_file": "models/groundnuts_model.joblib",
+    "dataset_source": "GCEK Kalahandi / PeerJ CS IoT-IIRS Dataset",
+    "source_url": "https://github.com/GCEKIoTCommunity/Irrigation-Dataset",
+    "records_count": 50,
+    "features": [
+      "CropDays",
+      "Soil Moisture",
+      "Soil Temperature",
+      "Temperature",
+      "Humidity"
+    ],
+    "algorithm": "Logistic Regression with StandardScaler",
+    "accuracy": 0.8,
+    "precision": 0.5,
+    "recall": 0.5,
+    "f1_score": 0.5,
+    "confusion_matrix": [
+      [
+        7,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "training_date": "2026-11-11"
+  },
+  "wheat": {
+    "crop_key": "wheat",
+    "crop_code": "wheat",
+    "crop_name": "Wheat (Gehun)",
+    "model_file": "models/wheat_model.joblib",
+    "dataset_source": "NIT Raipur Dept of Computer Applications Agricultural Automation",
+    "source_url": "https://github.com/NitrrMCACommunity/Agriculture-Automation-",
+    "records_count": 78,
+    "features": [
+      "CropDays",
+      "SoilMoisture",
+      "Temperature",
+      "Humidity"
+    ],
+    "algorithm": "Random Forest Classifier (Balanced)",
+    "accuracy": 0.85,
+    "precision": 0.8333,
+    "recall": 0.7143,
+    "f1_score": 0.7692,
+    "confusion_matrix": [
+      [
+        12,
+        1
+      ],
+      [
+        2,
+        5
+      ]
+    ],
+    "training_date": "2026-11-11"
+  },
+  "maize": {
+    "crop_key": "maize",
+    "crop_code": "maize",
+    "crop_name": "Maize / Corn (Makka)",
+    "model_file": "models/maize_model.joblib",
+    "dataset_source": "NIT Raipur Dept of Computer Applications Agricultural Automation",
+    "source_url": "https://github.com/NitrrMCACommunity/Agriculture-Automation-",
+    "records_count": 44,
+    "features": [
+      "CropDays",
+      "SoilMoisture",
+      "Temperature",
+      "Humidity"
+    ],
+    "algorithm": "Random Forest Classifier (Balanced)",
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "confusion_matrix": [
+      [
+        4,
+        0
+      ],
+      [
+        0,
+        7
+      ]
+    ],
+    "training_date": "2026-11-11"
+  },
+  "sugarcane": {
+    "crop_key": "sugarcane",
+    "crop_code": "sugarcane",
+    "crop_name": "Sugarcane (Ganna)",
+    "model_file": "models/sugarcane_model.joblib",
+    "dataset_source": "NIT Raipur Dept of Computer Applications Agricultural Automation",
+    "source_url": "https://github.com/NitrrMCACommunity/Agriculture-Automation-",
+    "records_count": 102,
+    "features": [
+      "CropDays",
+      "SoilMoisture",
+      "Temperature",
+      "Humidity"
+    ],
+    "algorithm": "Logistic Regression with StandardScaler",
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "confusion_matrix": [
+      [
+        18,
+        0
+      ],
+      [
+        0,
+        8
+      ]
+    ],
+    "training_date": "2026-11-11"
+  },
+  "tomato": {
+    "crop_key": "tomato",
+    "crop_code": "tomato",
+    "crop_name": "Tomato (Tamatar)",
+    "model_file": "models/tomato_model.joblib",
+    "dataset_source": "Mendeley Data DOI 10.17632/c837v6p8ph.2 (Univ of Salento/Bari)",
+    "source_url": "https://data.mendeley.com/datasets/c837v6p8ph/2",
+    "records_count": 3398,
+    "features": [
+      "soil_moisture",
+      "soil_temp",
+      "air_temp",
+      "humidity"
+    ],
+    "algorithm": "Random Forest Classifier (Balanced)",
+    "accuracy": 0.8,
+    "precision": 0.2147,
+    "recall": 0.814,
+    "f1_score": 0.3398,
+    "confusion_matrix": [
+      [
+        509,
+        128
+      ],
+      [
+        8,
+        35
+      ]
+    ],
+    "training_date": "2026-11-11"
+  },
+  "chilli": {
+    "crop_key": "chilli",
+    "crop_code": "chilli",
+    "crop_name": "Chilli (Mirchi)",
+    "model_file": "models/chilli_model.joblib",
+    "dataset_source": "Smart Agriculture Dataset (Kaggle / Chaitanya Gopidesi)",
+    "source_url": "https://www.kaggle.com/datasets/chaitanyagopidesi/smart-agriculture-dataset",
+    "records_count": 2764,
+    "features": [
+      "MOI",
+      "temp",
+      "humidity"
+    ],
+    "algorithm": "Random Forest Classifier",
+    "accuracy": 0.9747,
+    "precision": 0.9661,
+    "recall": 0.9744,
+    "f1_score": 0.9702,
+    "confusion_matrix": [
+      [
+        311,
+        8
+      ],
+      [
+        6,
+        228
+      ]
+    ],
+    "training_date": "2026-11-11"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "test_accuracy": 1.0,
+  "features": [
+    "state_or_UT",
+    "crop",
+    "crop_age_days",
+    "sensor_reading",
+    "gap_to_trigger",
+    "soil_temperature_c",
+    "air_temperature_c",
+    "relative_humidity_pct",
+    "rainfall_last_7_days_mm",
+    "forecast_rainfall_next_24h_mm"
+  ],
+  "rows": 16240
+}

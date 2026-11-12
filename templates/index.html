@@ -1,0 +1,625 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f2f8ff">
+    <title>Smart Irrigation Planner</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Top navigation -->
+    <header class="topbar">
+        <a class="brand" href="/" aria-label="Smart Irrigation Planner">
+            <span class="brand-icon">🌿</span>
+            <span>
+                <strong data-i18n="title">Smart Irrigation Planner</strong>
+                <small data-i18n="subtitle">Simple support for smarter farming</small>
+            </span>
+        </a>
+
+        <div class="top-actions">
+            <div class="language-box">
+                <label for="language" data-i18n="languageLabel">
+                    Choose Language
+                </label>
+                <select id="language">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="pa">ਪੰਜਾਬੀ</option>
+                    <option value="te">తెలుగు</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Agricultural hero banner -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-eyebrow">🌱 SMART FARMING TECHNOLOGY</span>
+
+            <h1 data-i18n="welcome">
+                Let's check your field
+            </h1>
+
+            <p data-i18n="intro">
+                Enter your crop and sensor readings.
+            </p>
+
+            <div class="benefits">
+                <div class="benefit">
+                    <span class="benefit-icon">💧</span>
+                    <span>
+                        <strong>Save Water</strong>
+                        <small>Use water thoughtfully</small>
+                    </span>
+                </div>
+
+                <div class="benefit">
+                    <span class="benefit-icon">🌱</span>
+                    <span>
+                        <strong>Healthier Crops</strong>
+                        <small>Support crop growth</small>
+                    </span>
+                </div>
+
+                <div class="benefit">
+                    <span class="benefit-icon">📈</span>
+                    <span>
+                        <strong>AI Assistance</strong>
+                        <small>Data-based estimates</small>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-sensors" aria-label="Example sensor indicators">
+            <div class="floating-sensor sensor-moisture">
+                <span>💧</span>
+                <div>
+                    <small>Soil Moisture</small>
+                    <strong id="heroMoisture">--</strong>
+                </div>
+            </div>
+
+            <div class="floating-sensor sensor-temperature">
+                <span>🌡️</span>
+                <div>
+                    <small>Air Temperature</small>
+                    <strong id="heroTemperature">-- °C</strong>
+                </div>
+            </div>
+
+            <div class="floating-sensor sensor-humidity">
+                <span>💦</span>
+                <div>
+                    <small>Humidity</small>
+                    <strong id="heroHumidity">--%</strong>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main dashboard -->
+    <main class="dashboard">
+
+        <!-- Input panel -->
+        <section class="panel input-panel">
+            <div class="panel-heading green-heading">
+                <span class="panel-heading-icon">🌱</span>
+                <div>
+                    <h2 data-i18n="formTitle">Crop and Soil Details</h2>
+                    <p>Enter your crop information, state, and sensor readings</p>
+                </div>
+            </div>
+
+            <form id="irrigationForm" class="form-content">
+
+                <!-- Step 1: State or UT Selection -->
+                <div class="field">
+                    <label for="state_select" data-i18n="stateLabel">
+                        Step 1: Select State or Union Territory
+                    </label>
+                    <div class="state-row">
+                        <div class="input-with-icon">
+                            <span aria-hidden="true">🏛️</span>
+                            <select id="state_select" name="state" required>
+                                <option value="">-- Choose your State or UT --</option>
+                            </select>
+                        </div>
+                        <button type="button" id="btnDetectLocation" class="btn-location" title="Detect location">
+                            <span aria-hidden="true">📍</span>
+                            <span data-i18n="btnLocation">Detect</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Crop Selection -->
+                <div class="field">
+                    <label for="crop_type" data-i18n="cropLabel">
+                        Step 2: Select Crop
+                    </label>
+                    <div class="input-with-icon">
+                        <span id="cropIcon" aria-hidden="true">🌾</span>
+                        <select id="crop_type" name="crop_type" required disabled>
+                            <option value="">-- Select a state first --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Step 3: Range & Decision Zones Display Card -->
+                <div id="cropRangeCard" class="crop-range-card" style="display: none;">
+                    <div class="range-card-header">
+                        <strong id="rangeCropTitle">🌾 Decision Zones for Crop</strong>
+                        <span id="rangeSourceBadge" class="crop-status-badge">State Range Rule</span>
+                    </div>
+                    <div id="rangeSummaryText" class="range-summary-text">
+                        Irrigate: 0-40% | Monitor: 40-60% | No need: 60-100%
+                    </div>
+                    <div class="zone-bar-container">
+                        <div id="zoneBar" class="zone-bar">
+                            <div id="segIrrigate" class="zone-segment zone-irrigate" style="width: 40%;">IRRIGATE</div>
+                            <div id="segMonitor" class="zone-segment zone-monitor" style="width: 20%;">MONITOR</div>
+                            <div id="segNoIrrigate" class="zone-segment zone-no-irrigate" style="width: 40%;">DO NOT IRRIGATE</div>
+                        </div>
+                        <div id="zoneLabels" class="zone-labels">
+                            <span id="lblMin">0%</span>
+                            <span id="lblTrigger">40% (Trigger)</span>
+                            <span id="lblWetLimit">60% (Wet)</span>
+                            <span id="lblMax">100%</span>
+                        </div>
+                    </div>
+                    <div class="rain-override-notice">
+                        <span aria-hidden="true">🌧️</span>
+                        <span>Rain Override: If rainfall in last 7 days ≥ 10 mm, decision is strictly <strong>DO NOT IRRIGATE</strong>.</span>
+                    </div>
+                </div>
+
+                <!-- Step 4: Numeric Inputs -->
+                <div class="field">
+                    <label for="crop_days" data-i18n="daysLabel">
+                        Crop age (days)
+                    </label>
+                    <div class="input-with-icon">
+                        <span aria-hidden="true">📅</span>
+                        <input type="number" id="crop_days"
+                               min="1" step="1"
+                               placeholder="Example: 30" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="soil_moisture" id="sensorReadingLabel" data-i18n="moistureLabel">
+                        Soil moisture (% of field capacity)
+                    </label>
+                    <div class="input-with-icon">
+                        <span id="sensorReadingIcon" aria-hidden="true">🪴</span>
+                        <input type="number" id="soil_moisture"
+                               step="any" placeholder="Sensor reading" required>
+                        <span id="sensorReadingSuffix" class="input-suffix">💧</span>
+                    </div>
+                    <small id="sensorReadingHelp" data-i18n="moistureHelp">
+                        Enter the sensor reading (0 - 100%).
+                    </small>
+                </div>
+
+                <div class="field">
+                    <label for="soil_temperature" data-i18n="soilTempLabel">
+                        Soil temperature
+                    </label>
+                    <div class="unit-row">
+                        <div class="input-with-icon">
+                            <span aria-hidden="true">🌡️</span>
+                            <input type="number" id="soil_temperature"
+                                   step="any" placeholder="Example: 24" required>
+                        </div>
+                        <select id="soil_temp_unit"
+                                aria-label="Soil temperature unit">
+                            <option value="C">°C</option>
+                            <option value="F">°F</option>
+                            <option value="K">K</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="temperature" data-i18n="airTempLabel">
+                        Air temperature
+                    </label>
+                    <div class="unit-row">
+                        <div class="input-with-icon">
+                            <span aria-hidden="true">🌡️</span>
+                            <input type="number" id="temperature"
+                                   step="any" placeholder="Example: 28" required>
+                        </div>
+                        <select id="air_temp_unit"
+                                aria-label="Air temperature unit">
+                            <option value="C">°C</option>
+                            <option value="F">°F</option>
+                            <option value="K">K</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="humidity" data-i18n="humidityLabel">
+                        Relative humidity
+                    </label>
+                    <div class="unit-row">
+                        <div class="input-with-icon">
+                            <span aria-hidden="true">💧</span>
+                            <input type="number" id="humidity"
+                                   min="0" max="100" step="any"
+                                   placeholder="Example: 62" required>
+                        </div>
+                        <span class="unit-symbol">%</span>
+                    </div>
+                </div>
+
+                <!-- Rainfall in last 7 days (Required) -->
+                <div class="field">
+                    <label for="rainfall_7d" data-i18n="rainfall7dLabel">
+                        Rainfall in last 7 days (mm) *
+                    </label>
+                    <div class="unit-row">
+                        <div class="input-with-icon">
+                            <span aria-hidden="true">🌧️</span>
+                            <input type="number" id="rainfall_7d"
+                                   min="0" step="any"
+                                   placeholder="Example: 0.0" required>
+                        </div>
+                        <span class="unit-symbol">mm</span>
+                    </div>
+                    <small data-i18n="rainfall7dHelp">
+                        Required. If 10 mm or more, irrigation is paused automatically.
+                    </small>
+                </div>
+
+                <!-- Forecast rainfall next 24 h (Optional, default 0) -->
+                <div class="field">
+                    <label for="forecast_24h" data-i18n="forecast24hLabel">
+                        Forecast rainfall next 24 hours (mm)
+                    </label>
+                    <div class="unit-row">
+                        <div class="input-with-icon">
+                            <span aria-hidden="true">🌦️</span>
+                            <input type="number" id="forecast_24h"
+                                   min="0" step="any"
+                                   placeholder="Example: 0.0">
+                        </div>
+                        <span class="unit-symbol">mm</span>
+                    </div>
+                    <small data-i18n="forecast24hHelp">
+                        Optional (default is 0 mm).
+                    </small>
+                </div>
+
+                <div class="unit-note">
+                    <span aria-hidden="true">ℹ️</span>
+                    <p data-i18n="unitWarning">
+                        Temperatures are converted to Celsius for ML prediction.
+                        CSVs and rule ranges serve as the single source of truth.
+                    </p>
+                </div>
+
+                <button type="submit" id="predictButton" class="predict-button">
+                    <span data-i18n="predict">Check Irrigation</span>
+                    <span aria-hidden="true">➜</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Prediction panel -->
+        <section class="panel result-panel">
+            <div class="panel-heading blue-heading">
+                <span class="panel-heading-icon">📊</span>
+                <div>
+                    <h2 data-i18n="resultTitle">Your result</h2>
+                    <p>AI prediction & state-wise rule evaluation</p>
+                </div>
+            </div>
+
+            <div class="result-content">
+
+                <!-- Main Status Banner -->
+                <div class="prediction-banner" id="predictionBanner">
+                    <div class="status-icon" id="statusIcon">🌱</div>
+                    <div class="prediction-copy">
+                        <h3 id="predictionTitle" data-i18n="resultPlaceholder">
+                            Your prediction will appear here.
+                        </h3>
+                        <p id="predictionDescription">
+                            Select your state & crop, enter readings, and check your irrigation decision.
+                        </p>
+                    </div>
+                    <span class="result-plant" aria-hidden="true">🌿</span>
+                </div>
+
+                <!-- Rule Override Alert (if CSV rule overruled ML) -->
+                <div id="ruleOverrideAlert" class="rule-override-alert" style="display: none;">
+                    <span aria-hidden="true">⚖️</span>
+                    <span id="ruleOverrideText">Range rule precedence applied: Decision zone rules overrode the raw ML prediction.</span>
+                </div>
+
+                <!-- Zone Gauge / Marker Card -->
+                <div id="resultGaugeCard" class="result-gauge-wrap" style="display: none;">
+                    <div class="gauge-heading">
+                        <span>Reading vs Decision Zones</span>
+                        <span id="gaugeReadingText">--</span>
+                    </div>
+                    <div class="gauge-track">
+                        <div id="gaugeBarBg" class="gauge-bar-bg">
+                            <div id="gaugeSegIrrigate" class="zone-segment zone-irrigate" style="width: 40%;">IRRIGATE</div>
+                            <div id="gaugeSegMonitor" class="zone-segment zone-monitor" style="width: 20%;">MONITOR</div>
+                            <div id="gaugeSegNoIrrigate" class="zone-segment zone-no-irrigate" style="width: 40%;">DO NOT IRRIGATE</div>
+                        </div>
+                        <div id="gaugePointer" class="gauge-pointer" style="left: 0%;">
+                            <span id="gaugePointerLabel" class="gauge-pointer-label">0</span>
+                        </div>
+                    </div>
+                    <div class="zone-labels">
+                        <span id="gaugeLblMin">0</span>
+                        <span id="gaugeLblTrigger">Trigger</span>
+                        <span id="gaugeLblWetLimit">Wet</span>
+                        <span id="gaugeLblMax">Max</span>
+                    </div>
+                </div>
+
+                <!-- Probability Card -->
+                <div class="probability-card">
+                    <div class="probability-heading">
+                        <span>📈</span>
+                        <strong data-i18n="probability">Probability of irrigation needed</strong>
+                        <strong class="probability-value" id="probabilityValue">
+                            --%
+                        </strong>
+                    </div>
+
+                    <div class="progress-track"
+                         id="probabilityTrack"
+                         role="progressbar"
+                         aria-label="Probability of irrigation needed"
+                         aria-valuemin="0"
+                         aria-valuemax="100"
+                         aria-valuenow="0">
+                        <div class="progress-fill" id="probabilityBar"></div>
+                    </div>
+
+                    <div class="scale-labels">
+                        <span>0%</span>
+                        <span>25%</span>
+                        <span>50%</span>
+                        <span>75%</span>
+                        <span>100%</span>
+                    </div>
+                </div>
+
+                <div class="warning-card">
+                    <span class="warning-icon" aria-hidden="true">⚠️</span>
+                    <div>
+                        <strong>State-wise agricultural prediction</strong>
+                        <p data-i18n="disclaimer">
+                            This prediction combines genuine state-wise crop rules with Machine Learning.
+                            Always verify field conditions and rain forecast before irrigating.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Model and Dataset Specifications Card -->
+                <div class="model-info-card" id="modelInfoCard">
+                    <div class="model-info-header">
+                        <span>🔬</span>
+                        <strong id="modelInfoHeading" data-i18n="modelInfoTitle">Model & Dataset Specifications</strong>
+                    </div>
+                    <div class="model-info-grid">
+                        <div class="model-info-item">
+                            <span class="info-label" data-i18n="infoCrop">Active Crop</span>
+                            <strong class="info-value" id="infoCropName">--</strong>
+                        </div>
+                        <div class="model-info-item">
+                            <span class="info-label" data-i18n="infoAlgorithm">Algorithm</span>
+                            <strong class="info-value" id="infoAlgorithm">Random Forest (Pipeline)</strong>
+                        </div>
+                        <div class="model-info-item">
+                            <span class="info-label" data-i18n="infoDataset">Dataset Source</span>
+                            <strong class="info-value" id="infoDataset">India State-Wise Ranges</strong>
+                        </div>
+                        <div class="model-info-item">
+                            <span class="info-label" data-i18n="infoBadge">Badge</span>
+                            <strong class="info-value" id="infoBadgeText">Trained on state-wise crop irrigation dataset (synthetic rule-based)</strong>
+                        </div>
+                        <div class="model-info-item">
+                            <span class="info-label" data-i18n="infoRecords">Total Samples</span>
+                            <strong class="info-value" id="infoRecords">16,240 records</strong>
+                        </div>
+                        <div class="model-info-item">
+                            <span class="info-label" data-i18n="infoAccuracy">Accuracy</span>
+                            <strong class="info-value" id="infoAccuracy">100.0%</strong>
+                        </div>
+                        <div class="model-info-item">
+                            <span class="info-label" data-i18n="infoPrecision">Decision Source</span>
+                            <strong class="info-value" id="infoPrecRec">Rule-over-ML (Single Truth)</strong>
+                        </div>
+                        <div class="model-info-item">
+                            <span class="info-label" data-i18n="infoDate">Status</span>
+                            <strong class="info-value" id="infoDate">Production Ready</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Existing JavaScript writes API results here -->
+                <div id="result" class="api-result" aria-live="polite">
+                    Your prediction will appear here.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div>
+            <span>💧</span>
+            <p><strong>Save Water</strong><small>Use resources thoughtfully</small></p>
+        </div>
+        <div>
+            <span>🌿</span>
+            <p><strong>Healthier Crops</strong><small>Support better growth</small></p>
+        </div>
+        <div>
+            <span>👨‍🌾</span>
+            <p><strong>Built for Farmers</strong><small>Simple and multilingual</small></p>
+        </div>
+    </footer>
+
+    <!-- AgriSaathi Floating Chatbot Widget -->
+    <div id="agriChatWidget" class="agri-chat-widget">
+        <!-- Floating Trigger Button -->
+        <button id="agriChatToggle" class="agri-chat-toggle" aria-label="Open AgriSaathi AI Agricultural Chatbot" aria-expanded="false" aria-controls="agriChatWindow">
+            <span class="agri-toggle-icon" aria-hidden="true">🌱</span>
+            <span class="agri-toggle-close-icon" aria-hidden="true">✕</span>
+            <span class="agri-toggle-badge" title="AgriSaathi Online"></span>
+        </button>
+
+        <!-- Floating Chat Window -->
+        <div id="agriChatWindow" class="agri-chat-window" role="dialog" aria-modal="false" aria-labelledby="agriChatHeaderTitle" hidden>
+            <!-- Chat Header -->
+            <header class="agri-chat-header">
+                <div class="agri-header-brand">
+                    <div class="agri-avatar" aria-hidden="true">🌾</div>
+                    <div class="agri-header-text">
+                        <h3 id="agriChatHeaderTitle">AgriSaathi</h3>
+                        <p id="agriChatSubtitle"><span class="agri-online-dot"></span> AI Agricultural Assistant</p>
+                    </div>
+                </div>
+
+                <div class="agri-header-actions">
+                    <!-- Chat Language Selector -->
+                    <select id="agriChatLang" class="agri-chat-lang" aria-label="Select Chat Language">
+                        <option value="auto">🌐 Auto-Detect</option>
+                        <option value="en">English</option>
+                        <option value="hi">हिन्दी</option>
+                        <option value="pa">ਪੰਜਾਬੀ</option>
+                        <option value="te">తెలుగు</option>
+                    </select>
+
+                    <!-- New Chat Button -->
+                    <button id="agriNewChatBtn" class="agri-header-btn" type="button" aria-label="Start new chat" title="Start new chat">
+                        <span aria-hidden="true">➕</span>
+                    </button>
+
+                    <!-- Chat History Button -->
+                    <button id="agriHistoryBtn" class="agri-header-btn" type="button" aria-label="View conversation history" title="View conversation history">
+                        <span aria-hidden="true">📜</span>
+                    </button>
+
+                    <!-- Clear Active Conversation Button -->
+                    <button id="agriClearConvBtn" class="agri-header-btn" type="button" aria-label="Clear active conversation" title="Clear active conversation">
+                        <span aria-hidden="true">🧹</span>
+                    </button>
+
+                    <!-- Close Button -->
+                    <button id="agriChatClose" class="agri-close-btn" type="button" aria-label="Close AgriSaathi Chat">
+                        <span aria-hidden="true">✕</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Conversation History Panel -->
+            <div id="agriHistoryPanel" class="agri-history-panel" style="display: none;" hidden aria-label="Chat History">
+                <div class="agri-history-header">
+                    <div class="agri-history-title-wrap">
+                        <span class="agri-history-header-icon" aria-hidden="true">📜</span>
+                        <h4 id="agriHistoryTitle">Conversation History</h4>
+                    </div>
+                    <button type="button" id="agriHistoryCloseBtn" class="agri-history-close-btn" aria-label="Back to chat" title="Back to chat">
+                        <span aria-hidden="true">✕</span>
+                    </button>
+                </div>
+
+                <div class="agri-history-toolbar">
+                    <button type="button" id="agriNewChatFromHistoryBtn" class="agri-new-chat-action-btn">
+                        <span aria-hidden="true">➕</span>
+                        <span id="agriNewChatBtnText">Start New Chat</span>
+                    </button>
+                </div>
+
+                <div id="agriHistoryList" class="agri-history-list" role="list">
+                    <!-- Previous conversations rendered dynamically -->
+                </div>
+
+                <div class="agri-history-footer">
+                    <button type="button" id="agriClearAllHistoryBtn" class="agri-clear-all-btn">
+                        <span aria-hidden="true">🗑️</span>
+                        <span id="agriClearAllBtnText">Clear All History</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Message History Area -->
+            <div id="agriChatMessages" class="agri-chat-messages" role="log" aria-live="polite">
+                <!-- Welcome Message Bubble -->
+                <div class="agri-msg-row agri-msg-assistant">
+                    <div class="agri-msg-avatar" aria-hidden="true">🌱</div>
+                    <div class="agri-msg-bubble">
+                        <div class="agri-msg-text" id="agriWelcomeText">
+                            Hello! I am <strong>AgriSaathi</strong>, your smart farming companion. How can I help you with your irrigation, soil health, or crops today?
+                        </div>
+                        <span class="agri-msg-time">Just now</span>
+                    </div>
+                </div>
+
+                <!-- Suggested Questions Section -->
+                <div class="agri-suggestions" id="agriSuggestions">
+                    <p class="agri-suggestions-title" id="agriSuggestionsTitle">Suggested questions:</p>
+                    <div class="agri-chips">
+                        <button type="button" class="agri-chip" data-question="How can I save irrigation water?">
+                            💧 How can I save irrigation water?
+                        </button>
+                        <button type="button" class="agri-chip" data-question="Why is soil moisture important?">
+                            🪴 Why is soil moisture important?
+                        </button>
+                        <button type="button" class="agri-chip" data-question="Tell me about paddy irrigation.">
+                            🌾 Tell me about paddy irrigation.
+                        </button>
+                        <button type="button" class="agri-chip" data-question="Help me understand my irrigation prediction.">
+                            📊 Help me understand my irrigation prediction.
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing / Loading Indicator -->
+            <div id="agriTypingIndicator" class="agri-typing-indicator" aria-hidden="true" style="display: none;">
+                <div class="agri-msg-avatar">🌱</div>
+                <div class="agri-typing-bubble">
+                    <span class="agri-typing-dot"></span>
+                    <span class="agri-typing-dot"></span>
+                    <span class="agri-typing-dot"></span>
+                </div>
+                <span class="agri-typing-label" id="agriTypingLabel">AgriSaathi is typing...</span>
+            </div>
+
+            <!-- Footer / Input Form -->
+            <form id="agriChatForm" class="agri-chat-footer" autocomplete="off">
+                <input
+                    type="text"
+                    id="agriChatInput"
+                    class="agri-chat-input"
+                    placeholder="Ask AgriSaathi about crops or irrigation..."
+                    aria-label="Type your message to AgriSaathi"
+                    maxlength="500"
+                />
+                <button type="submit" id="agriSendBtn" class="agri-send-btn" aria-label="Send message">
+                    <span aria-hidden="true">➤</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+</body>
+</html>
